@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alex Chen — 全栈开发者 & 产品设计师</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== CSS 变量 & 主题 ===== */
+    :root {
+      --bg-primary: #080b14;
+      --bg-secondary: #0d1220;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(139, 92, 246, 0.4);
+
+      --accent: oklch(65% 0.22 285);
+      --accent-2: oklch(70% 0.18 200);
+      --accent-glow: rgba(139, 92, 246, 0.25);
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+
+      --radius-sm: 0.5rem;
+      --radius-md: 1rem;
+      --radius-lg: 1.5rem;
+      --radius-xl: 2rem;
+
+      --shadow-card: 0 1px 0 rgba(255,255,255,0.05) inset,
+                     0 20px 60px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 60px rgba(139, 92, 246, 0.15);
+
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ===== 全局重置 ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ===== 背景粒子光效 ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(56, 189, 248, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== 导航栏 ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(8, 11, 20, 0.75);
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-cta {
+      padding: 0.5rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* ===== 主内容区 ===== */
+    main { position: relative; z-index: 1; }
+    section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+    /* ===== Hero 区 ===== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 7rem;
+      gap: 2rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 1rem;
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: oklch(75% 0.18 285);
+      animation: fadeInDown 0.6s ease both;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: oklch(75% 0.22 285);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .hero-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 2px solid var(--border-hover);
+      object-fit: cover;
+      box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.1);
+      animation: fadeInDown 0.6s 0.1s ease both;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      animation: fadeInUp 0.7s 0.15s ease both;
+    }
+    .hero-title .gradient {
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 560px;
+      animation: fadeInUp 0.7s 0.25s ease both;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp 0.7s 0.35s ease both;
+    }
+    .btn-primary {
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(139, 92, 246, 0.5);
+    }
+    .btn-ghost {
+      padding: 0.75rem 2rem;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 999px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+      animation: fadeInUp 0.7s 0.45s ease both;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-stat .label { font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.125rem; }
+    .hero-scroll {
+      margin-top: 1rem;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeInUp 0.7s 0.55s ease both;
+    }
+    .scroll-icon {
+      width: 20px; height: 32px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      position: relative;
+    }
+    .scroll-icon::after {
+      content: '';
+      position: absolute;
+      top: 5px; left: 50%;
+      transform: translateX(-50%);
+      width: 3px; height: 6px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      animation: scrollDown 1.8s infinite;
+    }
+
+    /* ===== 关于我 ===== */
+    #about { padding-top: 5rem; }
+    .section-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: oklch(70% 0.18 285);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .about-text p {
+      color: var(--text-secondary);
+      font-size: 1.0625rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .tag {
+      padding: 0.375rem 0.875rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+    }
+    .tag:hover {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: rgba(139, 92, 246, 0.4);
+      color: oklch(75% 0.18 285);
+    }
+    .about-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-card);
+    }
+    .exp-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .exp-item:last-child { border-bottom: none; }
+    .exp-icon {
+      width: 40px; height: 40px;
+      background: rgba(139, 92, 246, 0.12);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .exp-role { font-weight: 600; font-size: 0.9375rem; }
+    .exp-company { color: var(--text-muted); font-size: 0.8125rem; margin-top: 0.125rem; }
+    .exp-year {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ===== 服务/专长 ===== */
+    #services { text-align: center; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+      text-align: left;
+    }
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-card);
+      transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+      cursor: default;
+    }
+    .service-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+    }
+    .service-icon {
+      width: 52px; height: 52px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .service-card:nth-child(1) .service-icon { background: rgba(139, 92, 246, 0.15); }
+    .service-card:nth-child(2) .service-icon { background: rgba(56, 189, 248, 0.12); }
+    .service-card:nth-child(3) .service-icon { background: rgba(52, 211, 153, 0.12); }
+    .service-name { font-size: 1.125rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .service-desc { color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.7; }
+    .service-list {
+      list-style: none;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .service-list li {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .service-list li::before {
+      content: '→';
+      color: var(--accent);
+      font-size: 0.75rem;
+    }
+
+    /* ===== 作品集 ===== */
+    #portfolio { text-align: center; }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+      text-align: left;
+    }
+    .project-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+    }
+    .project-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .project-card:hover .project-thumb { transform: scale(1.04); }
+    .project-img-wrap { overflow: hidden; }
+    .project-info { padding: 1.5rem; }
+    .project-tag {
+      display: inline-block;
+      padding: 0.25rem 0.625rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .project-card:nth-child(1) .project-tag { background: rgba(139,92,246,0.15); color: oklch(75% 0.18 285); }
+    .project-card:nth-child(2) .project-tag { background: rgba(56,189,248,0.12); color: oklch(75% 0.18 220); }
+    .project-card:nth-child(3) .project-tag { background: rgba(52,211,153,0.12); color: oklch(75% 0.15 160); }
+    .project-name { font-size: 1.0625rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .project-desc { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.65; }
+    .project-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .project-tech {
+      display: flex;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+    }
+    .tech-chip {
+      padding: 0.2rem 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .project-link {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .project-link:hover {
+      background: rgba(139,92,246,0.15);
+      border-color: var(--border-hover);
+    }
+
+    /* ===== 联系区 ===== */
+    #contact {
+      text-align: center;
+    }
+    .contact-box {
+      max-width: 700px;
+      margin: 3rem auto 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 3rem 2.5rem;
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+    }
+    .contact-email {
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 1rem 0;
+    }
+    .contact-sub {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .social-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color var(--transition), border-color var(--transition), background var(--transition), transform var(--transition);
+    }
+    .social-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+      background: rgba(139,92,246,0.1);
+      transform: translateY(-2px);
+    }
+    .social-icon { font-size: 1rem; }
+
+    /* ===== 页脚 ===== */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    footer span { color: oklch(65% 0.2 285); }
+
+    /* ===== 动画关键帧 ===== */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+    @keyframes scrollDown {
+      0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      80%  { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    }
+
+    /* ===== 滚动动画类 ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 900px) {
+      .about-grid,
+      .services-grid,
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero-stats { gap: 2rem; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 4rem 1.25rem; }
+      .contact-box { padding: 2rem 1.25rem; }
+      .hero-stats { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航栏 -->
+  <nav>
+    <div class="nav-logo">Alex Chen</div>
+    <ul class="nav-links">
+      <li><a href="#about">关于我</a></li>
+      <li><a href="#services">专长</a></li>
+      <li><a href="#portfolio">作品集</a></li>
+      <li><a href="#contact">联系</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">合作咨询</a>
+  </nav>
+
+  <main>
+    <!-- Hero 区域 -->
+    <section id="hero">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        目前接受新项目合作
+      </div>
+
+      <img
+        class="hero-avatar"
+        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
+        alt="Alex Chen 头像"
+      />
+
+      <h1 class="hero-title">
+        <span class="gradient">全栈开发者</span><br />
+        & 产品设计师
+      </h1>
+
+      <p class="hero-sub">
+        我专注于构建高性能 Web 应用与精美用户界面，
+        将技术与设计融为一体，让产品既好用又好看。
+      </p>
+
+      <div class="hero-actions">
+        <a href="#portfolio" class="btn-primary">查看我的作品</a>
+        <a href="#contact" class="btn-ghost">联系我 →</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num">5+</div>
+          <div class="label">年从业经验</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">40+</div>
+          <div class="label">完成项目</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">98%</div>
+          <div class="label">客户好评率</div>
+        </div>
+      </div>
+
+      <div class="hero-scroll">
+        <div class="scroll-icon"></div>
+        向下滚动探索
+      </div>
+    </section>
+
+    <!-- 关于我 -->
+    <section id="about">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <div class="section-label">关于我</div>
+          <h2 class="section-title">热爱技术，<br />痴迷设计</h2>
+          <p>
+            我是一名拥有 5 年经验的全栈开发者，擅长从 0 到 1 打造完整产品。
+            从架构设计到像素级 UI 还原，我享受每个环节带来的挑战与成就感。
+          </p>
+          <p>
+            我相信好的产品源于对用户的深度理解，代码是解决问题的工具，
+            而设计则是连接人与技术的桥梁。
+          </p>
+          <div class="skill-tags">
+            <span class="tag">React</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">Next.js</span>
+            <span class="tag">PostgreSQL</span>
+            <span class="tag">Figma</span>
+            <span class="tag">Tailwind CSS</span>
+            <span class="tag">Docker</span>
+            <span class="tag">AWS</span>
+            <span class="tag">GraphQL</span>
+          </div>
+        </div>
+
+        <div class="about-card reveal">
+          <div class="exp-item">
+            <div class="exp-icon">🚀</div>
+            <div>
+              <div class="exp-role">高级全栈工程师</div>
+              <div class="exp-company">字节跳动 · 飞书团队</div>
+            </div>
+            <div class="exp-year">2022 — 至今</div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-icon">💡</div>
+            <div>
+              <div class="exp-role">前端技术负责人</div>
+              <div class="exp-company">某独角兽创业公司</div>
+            </div>
+            <div class="exp-year">2020 — 2022</div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-icon">🎨</div>
+            <div>
+              <div class="exp-role">全栈开发工程师</div>
+              <div class="exp-company">阿里巴巴 · 淘宝</div>
+            </div>
+            <div class="exp-year">2018 — 2020</div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-icon">🎓</div>
+            <div>
+              <div class="exp-role">计算机科学学士</div>
+              <div class="exp-company">上海交通大学</div>
+            </div>
+            <div class="exp-year">2014 — 2018</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 服务/专长 -->
+    <section id="services">
+      <div class="section-label reveal">我的服务</div>
+      <h2 class="section-title reveal">能为您做什么</h2>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-icon">⚡</div>
+          <div class="service-name">全栈 Web 开发</div>
+          <div class="service-desc">从后端 API 到前端交互，构建完整、高性能的 Web 应用。</div>
+          <ul class="service-list">
+            <li>React / Next.js 应用开发</li>
+            <li>REST & GraphQL API 设计</li>
+            <li>数据库架构与优化</li>
+            <li>云端部署与 CI/CD</li>
+          </ul>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🎨</div>
+          <div class="service-name">UI/UX 设计</div>
+          <div class="service-desc">将用户需求转化为直观、美观且易用的界面设计方案。</div>
+          <ul class="service-list">
+            <li>产品原型与交互设计</li>
+            <li>设计系统搭建</li>
+            <li>响应式界面开发</li>
+            <li>用户体验优化</li>
+          </ul>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">📱</div>
+          <div class="service-name">移动端开发</div>
+          <div class="service-desc">基于 React Native 打造跨平台移动应用，一次开发双端运行。</div>
+          <ul class="service-list">
+            <li>iOS & Android 双端开发</li>
+            <li>性能优化与流畅动效</li>
+            <li>推送通知与离线支持</li>
+            <li>App Store 上线发布</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 作品集 -->
+    <section id="portfolio">
+      <div class="section-label reveal">精选作品</div>
+      <h2 class="section-title reveal">近期项目</h2>
+
+      <div class="portfolio-grid">
+        <div class="project-card reveal">
+          <div class="project-img-wrap">
+            <img
+              class="project-thumb"
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=337&fit=crop"
+              alt="数据分析平台"
+            />
+          </div>
+          <div class="project-info">
+            <span class="project-tag">全栈开发</span>
+            <div class="project-name">DataVision 数据分析平台</div>
+            <div class="project-desc">为企业用户打造的实时数据可视化仪表盘，支持多数据源接入与智能报表生成。</div>
+            <div class="project-footer">
+              <div class="project-tech">
+                <span class="tech-chip">React</span>
+                <span class="tech-chip">D3.js</span>
+                <span class="tech-chip">Node.js</span>
+              </div>
+              <a href="#" class="project-link">↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-img-wrap">
+            <img
+              class="project-thumb"
+              src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=337&fit=crop"
+              alt="电商平台"
+            />
+          </div>
+          <div class="project-info">
+            <span class="project-tag">电商平台</span>
+            <div class="project-name">ShopFlow 智能电商系统</div>
+            <div class="project-desc">高性能电商全链路解决方案，日均处理 10 万+ 订单，转化率提升 35%。</div>
+            <div class="project-footer">
+              <div class="project-tech">
+                <span class="tech-chip">Next.js</span>
+                <span class="tech-chip">PostgreSQL</span>
+                <span class="tech-chip">Redis</span>
+              </div>
+              <a href="#" class="project-link">↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-img-wrap">
+            <img
+              class="project-thumb"
+              src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&h=337&fit=crop"
+              alt="社交应用"
+            />
+          </div>
+          <div class="project-info">
+            <span class="project-tag">移动应用</span>
+            <div class="project-name">ConnectMe 社交应用</div>
+            <div class="project-desc">面向创作者的轻量社交平台，支持实时聊天、内容发布与智能推荐，用户超 50 万。</div>
+            <div class="project-footer">
+              <div class="project-tech">
+                <span class="tech-chip">React Native</span>
+                <span class="tech-chip">GraphQL</span>
+                <span class="tech-chip">AWS</span>
+              </div>
+              <a href="#" class="project-link">↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 联系区域 -->
+    <section id="contact">
+      <div class="section-label reveal">联系我</div>
+      <h2 class="section-title reveal">开启合作</h2>
+
+      <div class="contact-box reveal">
+        <p style="color:var(--text-secondary);font-size:1rem;">有项目想法？欢迎随时联系，<br />我通常在 24 小时内回复。</p>
+        <div class="contact-email">hello@alexchen.dev</div>
+        <p class="contact-sub">或通过社交平台找到我</p>
+        <div class="social-links">
+          <a href="#" class="social-btn">
+            <span class="social-icon">🐙</span> GitHub
+          </a>
+          <a href="#" class="social-btn">
+            <span class="social-icon">💼</span> LinkedIn
+          </a>
+          <a href="#" class="social-btn">
+            <span class="social-icon">🐦</span> Twitter
+          </a>
+          <a href="#" class="social-btn">
+            <span class="social-icon">📝</span> 我的博客
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer>
+    <p>© 2024 Alex Chen · 用 <span>♥</span> 与代码构建</p>
+  </footer>
+
+  <script>
+    // 滚动显示动画
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            // 为同一批次的元素添加交错延迟
+            const siblings = entry.target.parentElement.querySelectorAll('.reveal');
+            siblings.forEach((el, idx) => {
+              if (el === entry.target) {
+                setTimeout(() => el.classList.add('visible'), idx * 80);
+              }
+            });
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    reveals.forEach(el => observer.observe(el));
+
+    // 导航栏滚动样式
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      if (window.scrollY > 60) {
+        nav.style.background = 'rgba(8, 11, 20, 0.92)';
+      } else {
+        nav.style.background = 'rgba(8, 11, 20, 0.75)';
+      }
+    });
+
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // 数字动画（Hero 统计数字）
+    function animateCounter(el, target, suffix = '', duration = 1500) {
+      const start = performance.now();
+      const update = (time) => {
+        const elapsed = time - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target) + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+    const statNums = document.querySelectorAll('.hero-stat .num');
+    const targets = [5, 40, 98];
+    const suffixes = ['+', '+', '%'];
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          statNums.forEach((el, i) => animateCounter(el, targets[i], suffixes[i]));
+          statsObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    if (statNums.length) statsObserver.observe(statNums[0].closest('.hero-stats'));
+  </script>
+</body>
+</html>
